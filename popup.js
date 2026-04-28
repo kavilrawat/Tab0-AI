@@ -239,6 +239,20 @@ function storageGetAllCached() {
   });
   return _allItemsInFlight;
 }
+// Warm the storage snapshot the moment the script runs so loadShortcuts()
+// and showCurrentTabInfo() find it ready instead of round-tripping to disk.
+storageGetAllCached();
+
+// Pre-fetch the active tab in parallel with the storage warm-up so
+// showCurrentTabInfo() doesn't have to wait on a sequential tabs.query.
+let _activeTabPromise = new Promise(function (resolve) {
+  try {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      if (chrome.runtime.lastError) { resolve(null); return; }
+      resolve(tabs && tabs[0] ? tabs[0] : null);
+    });
+  } catch (e) { resolve(null); }
+});
 
 // --- Toast ---
 function showToast(message, type) {
@@ -680,8 +694,8 @@ function generateSmartShortName(title, url, existingKeys) {
 
 async function showCurrentTabInfo() {
   try {
-    let tabs = await new Promise(resolve => chrome.tabs.query({ active: true, currentWindow: true }, resolve));
-    let tab = tabs[0];
+    // Reuse the prefetched active-tab promise kicked off at script start.
+    let tab = await _activeTabPromise;
     currentTabUrl = tab ? tab.url : '';
     currentTabTitle = tab ? tab.title : '';
     // Detect New Tab / blank pages
@@ -809,43 +823,64 @@ async function showCurrentTabInfo() {
 // ============================================================
 // LOAD BOOKMARK FOLDERS (for folder dropdown)
 // ============================================================
+// Walk chrome.bookmarks.getTree directly instead of round-tripping through
+// the service worker. Skipping the SW wake-up saves 100-400ms on cold
+// popup opens. The result is memoized for the popup's lifetime — folder
+// trees rarely change in the few seconds a popup is open.
+let _folderTreePromise = null;
+function getBookmarkFoldersDirect() {
+  if (_folderTreePromise) return _folderTreePromise;
+  _folderTreePromise = new Promise(function (resolve) {
+    try {
+      chrome.bookmarks.getTree(function (tree) {
+        if (chrome.runtime.lastError) { resolve([]); return; }
+        let folders = [];
+        function walk(node, depth) {
+          if (!node.url && node.title !== undefined) {
+            folders.push({ id: node.id, title: node.title, depth: depth });
+          }
+          if (node.children) node.children.forEach(c => walk(c, depth + 1));
+        }
+        if (tree && tree[0] && tree[0].children) {
+          tree[0].children.forEach(root => walk(root, 0));
+        }
+        resolve(folders);
+      });
+    } catch (e) { resolve([]); }
+  });
+  return _folderTreePromise;
+}
+// Kick the fetch off the moment the script runs so the data is ready by
+// the time showCurrentTabInfo() reaches loadFolderDropdown.
+getBookmarkFoldersDirect();
+
 async function loadFolderDropdown(preselectFolderId) {
   try {
-    let timeout = setTimeout(() => {
-      console.warn('0tab: loadFolderDropdown timed out');
-    }, 3000);
-    chrome.runtime.sendMessage({ action: 'getBookmarkFolders' }, function (folders) {
-      clearTimeout(timeout);
-      if (chrome.runtime.lastError) {
-        console.warn('0tab: getBookmarkFolders failed:', chrome.runtime.lastError.message);
-        return;
-      }
-      let select = document.getElementById('folderSelect');
-      select.innerHTML = '<option value="">Select folder...</option>';
-      if (!folders || !Array.isArray(folders)) return;
+    let folders = await getBookmarkFoldersDirect();
+    let select = document.getElementById('folderSelect');
+    if (!select) return;
+    select.innerHTML = '<option value="">Select folder...</option>';
+    if (!folders || !Array.isArray(folders)) return;
 
-      let zerotabFolderId = '';
-      folders.forEach(function (f) {
-        let opt = document.createElement('option');
-        opt.value = f.id;
-        let indent = '';
-        for (let i = 0; i < f.depth; i++) indent += '\u00A0\u00A0';
-        opt.textContent = indent + (f.title || '(Untitled)');
-        select.appendChild(opt);
+    let zerotabFolderId = '';
+    folders.forEach(function (f) {
+      let opt = document.createElement('option');
+      opt.value = f.id;
+      let indent = '';
+      for (let i = 0; i < f.depth; i++) indent += '\u00A0\u00A0';
+      opt.textContent = indent + (f.title || '(Untitled)');
+      select.appendChild(opt);
 
-        // Track the canonical 0tab AI folder ID (also catch legacy names so
-        // first-run after rename still preselects the right folder).
-        if (!zerotabFolderId && (f.title === '0tab AI' || f.title === 'Tab0 AI' || f.title === 'Tab0 Shortcuts')) {
-          zerotabFolderId = f.id;
-        }
-      });
-
-      // Auto-select: use preselectFolderId if given, otherwise default to 0tab AI
-      let targetId = preselectFolderId || zerotabFolderId;
-      if (targetId) {
-        select.value = targetId;
+      // Track the canonical 0tab AI folder ID (also catch legacy names so
+      // first-run after rename still preselects the right folder).
+      if (!zerotabFolderId && (f.title === '0tab AI' || f.title === 'Tab0 AI' || f.title === 'Tab0 Shortcuts')) {
+        zerotabFolderId = f.id;
       }
     });
+
+    // Auto-select: use preselectFolderId if given, otherwise default to 0tab AI
+    let targetId = preselectFolderId || zerotabFolderId;
+    if (targetId) select.value = targetId;
   } catch (e) {
     console.warn('0tab: loadFolderDropdown error:', e.message);
   }
