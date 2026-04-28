@@ -150,15 +150,27 @@ function __0tabEnsureMigratedV2() {
                 removes.push(oldK);
               }
             });
+            // Order: writes → removes → flag. Set migrated_v2 ONLY after
+            // both succeeded without lastError; if either fails we resolve
+            // without flagging so the next load retries.
             function finish() {
               chrome.storage.local.set({ '__0tab_migrated_v2': true }, function () { resolve(); });
             }
             function doRemove() {
-              if (removes.length) chrome.storage.local.remove(removes, finish);
-              else finish();
+              if (removes.length === 0) { finish(); return; }
+              chrome.storage.local.remove(removes, function () {
+                if (chrome.runtime.lastError) { resolve(); return; }
+                finish();
+              });
             }
-            if (Object.keys(writes).length) chrome.storage.local.set(writes, doRemove);
-            else doRemove();
+            if (Object.keys(writes).length === 0) {
+              doRemove();
+            } else {
+              chrome.storage.local.set(writes, function () {
+                if (chrome.runtime.lastError) { resolve(); return; }
+                doRemove();
+              });
+            }
           });
         });
       } catch (e) { resolve(); }
@@ -199,6 +211,33 @@ function storageRemove(keys) {
       });
     });
   });
+}
+
+// --- All-items cache (read-only) ---
+// loadShortcuts() runs on every search keystroke and previously hit
+// chrome.storage.local.get(null) each time. We memoize the snapshot for
+// search/render-only paths and invalidate on any local-storage change.
+// Callers that mutate entries must continue to use storageGet(null) so
+// they don't read or write through the shared cache reference.
+let _allItemsCache = null;
+let _allItemsInFlight = null;
+try {
+  chrome.storage.onChanged.addListener(function (_changes, area) {
+    if (area === 'local') _allItemsCache = null;
+  });
+} catch (e) { /* onChanged unavailable in some test contexts */ }
+function storageGetAllCached() {
+  if (_allItemsCache) return Promise.resolve(_allItemsCache);
+  if (_allItemsInFlight) return _allItemsInFlight;
+  _allItemsInFlight = storageGet(null).then(function (items) {
+    _allItemsCache = items || {};
+    _allItemsInFlight = null;
+    return _allItemsCache;
+  }, function (err) {
+    _allItemsInFlight = null;
+    throw err;
+  });
+  return _allItemsInFlight;
 }
 
 // --- Toast ---
@@ -665,7 +704,7 @@ async function showCurrentTabInfo() {
     }
 
     // Check if this URL already has a shortcut saved
-    let allItems = await storageGet(null);
+    let allItems = await storageGetAllCached();
     let existingKeys = Object.keys(allItems).filter(isShortcutKey);
     let existingShortcutName = '';
 
@@ -837,7 +876,7 @@ async function saveShortcut() {
     // Get tags from widget
     let tags = popupTagsWidget ? popupTagsWidget.getTags() : [];
 
-    let items = await storageGet(null);
+    let items = await storageGetAllCached();
     let isEditMode = !!existingShortcutKey;
 
     // Strict duplicate checks — only block on exact matches, never on AI
@@ -1256,7 +1295,7 @@ async function loadShortcuts() {
   let searchValue = document.getElementById('searchShortcuts').value.toLowerCase().trim();
 
   try {
-    let items = await storageGet(null);
+    let items = await storageGetAllCached();
     let list = document.getElementById('shortcutList');
     list.innerHTML = '';
 
@@ -1851,7 +1890,7 @@ function editShortcut(key, url) {
               if (newShortcut.length > 15) { showToast('Shortcut too long (max 15).', 'error'); return; }
 
               try {
-                let items = await storageGet(null);
+                let items = await storageGetAllCached();
                 if (items[newShortcut] && newShortcut !== key) { showToast(newShortcut + ' already exists!', 'error'); return; }
 
                 if (isFolder) {
@@ -1961,7 +2000,7 @@ async function saveFolderShortcut() {
 
             try {
               // Check if name already taken
-              let items = await storageGet(null);
+              let items = await storageGetAllCached();
               if (items[shortcutName] && isShortcutKey(shortcutName)) {
                 showToast(shortcutName + ' already exists!', 'error');
                 return;

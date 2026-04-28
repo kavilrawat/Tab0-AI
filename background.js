@@ -321,15 +321,29 @@ function __0tabEnsureMigratedV2() {
                 removes.push(oldK);
               }
             });
+            // Order: writes → removes → flag. The migrated_v2 flag is set
+            // ONLY after both writes and removes succeed without lastError;
+            // if either fails we resolve without setting the flag so the
+            // next load retries. Old keys may briefly co-exist with new
+            // keys mid-migration — readers go through the rename map.
             function finish() {
               chrome.storage.local.set({ '__0tab_migrated_v2': true }, function () { resolve(); });
             }
             function doRemove() {
-              if (removes.length) chrome.storage.local.remove(removes, finish);
-              else finish();
+              if (removes.length === 0) { finish(); return; }
+              chrome.storage.local.remove(removes, function () {
+                if (chrome.runtime.lastError) { resolve(); return; }
+                finish();
+              });
             }
-            if (Object.keys(writes).length) chrome.storage.local.set(writes, doRemove);
-            else doRemove();
+            if (Object.keys(writes).length === 0) {
+              doRemove();
+            } else {
+              chrome.storage.local.set(writes, function () {
+                if (chrome.runtime.lastError) { resolve(); return; }
+                doRemove();
+              });
+            }
           });
         });
       } catch (e) { resolve(); }
@@ -413,9 +427,11 @@ function _flushAccessLog() {
       if (!dailyStats[today]) dailyStats[today] = { opens: 0 };
       dailyStats[today].opens = (dailyStats[today].opens || 0) + toAdd;
 
-      // Prune entries older than 90 days
+      // Prune entries older than 365 days. The heatmap only renders 84 days
+      // but the rolling year buys headroom for future "year in review" type
+      // views without unbounded growth in chrome.storage.local.
       let cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - 90);
+      cutoff.setDate(cutoff.getDate() - 365);
       let cutoffStr = cutoff.toISOString().slice(0, 10);
       Object.keys(dailyStats).forEach(d => { if (d < cutoffStr) delete dailyStats[d]; });
 

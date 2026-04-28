@@ -1054,15 +1054,27 @@
                   removes.push(oldK);
                 }
               });
+              // Order: writes → removes → flag. Set migrated_v2 ONLY after
+              // both succeeded without lastError; if either fails we resolve
+              // without flagging so the next load retries.
               function finish() {
                 chrome.storage.local.set({ '__0tab_migrated_v2': true }, function () { resolve(); });
               }
               function doRemove() {
-                if (removes.length) chrome.storage.local.remove(removes, finish);
-                else finish();
+                if (removes.length === 0) { finish(); return; }
+                chrome.storage.local.remove(removes, function () {
+                  if (chrome.runtime.lastError) { resolve(); return; }
+                  finish();
+                });
               }
-              if (Object.keys(writes).length) chrome.storage.local.set(writes, doRemove);
-              else doRemove();
+              if (Object.keys(writes).length === 0) {
+                doRemove();
+              } else {
+                chrome.storage.local.set(writes, function () {
+                  if (chrome.runtime.lastError) { resolve(); return; }
+                  doRemove();
+                });
+              }
             });
           });
         } catch (e) { resolve(); }

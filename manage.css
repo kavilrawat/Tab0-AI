@@ -3343,16 +3343,6 @@ body.chat-panel-open .bm-panel-container {
   color: var(--text-secondary);
   line-height: 1.5;
 }
-.chat-capabilities summary {
-  list-style: none;
-}
-.chat-capabilities summary::-webkit-details-marker {
-  display: none;
-}
-.chat-capabilities[open] summary {
-  margin-bottom: 4px;
-}
-
 /* ============================================================
    TRASH SECTION (Settings)
    ============================================================ */
