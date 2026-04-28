@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "0tab AI",
+  "version": "5.7",
+  "description": "AI bookmark shortcuts from your search bar. Organize, drag & drop, chat — powered by Gemini Nano.",
+  "permissions": ["contextMenus", "storage", "tabs", "activeTab", "notifications", "bookmarks", "webNavigation", "tabGroups", "identity", "favicon", "offscreen", "history"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "omnibox": {
+    "keyword": "0"
+  },
+  "options_page": "manage.html",
+  "commands": {
+    "open-dashboard": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+0",
+        "mac": "Command+Shift+0"
+      },
+      "description": "Open 0tab Dashboard"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

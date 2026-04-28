@@ -1,0 +1,1451 @@
+/* ============================================================
+   0TAB - Popup Styles (Theme-aware: Dark + Light)
+   ============================================================ */
+
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url('fonts/inter-400.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url('fonts/inter-500.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; font-display: swap; src: url('fonts/inter-600.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 700; font-display: swap; src: url('fonts/inter-700.woff2') format('woff2'); }
+
+/* --- CSS Variables (Light = default for popup) --- */
+:root {
+  --popup-bg: #FFFFFF;
+  --popup-bg-secondary: #F9FAFB;
+  --popup-border: #E5E7EB;
+  --popup-border-focus: #2889FF;
+  --popup-text: #101828;
+  --popup-text-secondary: #6A7282;
+  --popup-text-muted: #99A1AF;
+  --popup-hover: #F3F4F6;
+  --popup-accent: #2889FF;
+  --popup-accent-secondary: #7F51FF;
+  --popup-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+body.theme-dark {
+  --popup-bg: #1A1A1A;
+  --popup-bg-secondary: #0F0F0F;
+  --popup-border: #2A2A2A;
+  --popup-border-focus: #2889FF;
+  --popup-text: #E5E5E5;
+  --popup-text-secondary: #999;
+  --popup-text-muted: #666;
+  --popup-hover: #252525;
+  --popup-accent: #2889FF;
+  --popup-accent-secondary: #7F51FF;
+  --popup-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style: none;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  width: 400px;
+  background: var(--popup-bg-secondary);
+  color: var(--popup-text);
+}
+
+.popup {
+  background: var(--popup-bg);
+  min-height: 100%;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--popup-border);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.header-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--popup-text);
+  letter-spacing: -0.3px;
+}
+
+.header-dashboard-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--popup-text-secondary);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: all 0.15s;
+}
+
+.header-dashboard-btn:hover {
+  background: var(--popup-hover);
+  color: var(--popup-text);
+}
+
+.header-dashboard-btn svg {
+  opacity: 0.6;
+}
+
+/* ============================================================
+   ICON BUTTONS
+   ============================================================ */
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background 0.15s;
+  color: var(--popup-text-muted);
+}
+
+.icon-btn:hover {
+  background: var(--popup-hover);
+}
+
+.icon-btn svg {
+  stroke: var(--popup-text-muted);
+}
+
+/* ============================================================
+   SAVED BANNER (already-saved indicator)
+   ============================================================ */
+.saved-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: rgba(34, 197, 94, 0.08);
+  border-bottom: 1px solid rgba(34, 197, 94, 0.15);
+}
+
+.saved-banner.hidden {
+  display: none;
+}
+
+.saved-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saved-banner-icon {
+  color: #22C55E;
+  stroke: #22C55E;
+  flex-shrink: 0;
+}
+
+#savedBannerText {
+  font-size: 12px;
+  font-weight: 600;
+  color: #22C55E;
+  letter-spacing: 0.01em;
+}
+
+.saved-banner-folder {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--popup-text-secondary);
+  background: var(--popup-hover);
+  padding: 3px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.saved-banner-folder:empty {
+  display: none;
+}
+
+/* Dark theme adjustments */
+body.theme-dark .saved-banner {
+  background: rgba(34, 197, 94, 0.06);
+  border-bottom-color: rgba(34, 197, 94, 0.1);
+}
+
+/* ============================================================
+   CREATE SECTION
+   ============================================================ */
+.create-section {
+  padding: 12px 20px 0;
+}
+
+.field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--popup-text-secondary);
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+
+.input-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.input-row .field-label {
+  width: 100%;
+  margin-bottom: -4px;
+}
+
+.input-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--popup-border);
+  border-radius: 12px;
+  background: var(--popup-bg);
+  overflow: hidden;
+  height: 42px;
+  transition: border-color 0.15s;
+}
+
+.input-field:focus-within {
+  border-color: var(--popup-border-focus);
+  box-shadow: 0 0 0 3px rgba(40, 137, 255, 0.08);
+}
+
+.input-prefix {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--popup-text-muted);
+  white-space: nowrap;
+  background: var(--popup-bg-secondary);
+  height: 100%;
+  border-right: 1px solid var(--popup-border);
+}
+
+.input-field input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 0 14px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  color: var(--popup-text);
+  height: 100%;
+  background: transparent;
+}
+
+.input-field input::placeholder {
+  color: var(--popup-text-muted);
+}
+
+.input-field input[readonly] {
+  color: var(--popup-text-secondary);
+}
+
+/* Folder select */
+.folder-select {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 0 12px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  color: var(--popup-text-muted);
+  height: 100%;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+}
+
+.folder-select:focus {
+  color: var(--popup-text);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+  margin-bottom: 14px;
+}
+
+.btn {
+  flex: 1;
+  height: 38px;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-outline {
+  background: var(--popup-bg);
+  border: 1.5px solid var(--popup-border);
+  color: var(--popup-text-secondary);
+}
+
+.btn-outline:hover {
+  background: var(--popup-hover);
+  border-color: var(--popup-text-muted);
+  color: var(--popup-text);
+}
+
+/* Primary save button — accent gradient so it stands apart from Cancel */
+.btn-primary {
+  background: linear-gradient(135deg, var(--popup-accent), var(--popup-accent-secondary));
+  border: 1.5px solid transparent;
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(40, 137, 255, 0.25);
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 4px 14px rgba(40, 137, 255, 0.32);
+}
+.btn-primary:active { transform: translateY(1px); }
+
+.btn-folder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.btn-folder svg {
+  stroke: var(--popup-text-secondary);
+  flex-shrink: 0;
+}
+
+.btn-folder:hover svg {
+  stroke: var(--popup-accent);
+}
+
+/* ============================================================
+   SEARCH ROW
+   ============================================================ */
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px 10px;
+  border-top: 1px solid var(--popup-border);
+}
+
+.search-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--popup-border);
+  border-radius: 10px;
+  height: 36px;
+  padding: 0 10px;
+  background: var(--popup-bg);
+  transition: border-color 0.15s;
+}
+
+.search-field:focus-within {
+  border-color: var(--popup-border-focus);
+  box-shadow: 0 0 0 3px rgba(40, 137, 255, 0.08);
+}
+
+.search-icon {
+  flex-shrink: 0;
+  margin-right: 8px;
+  stroke: var(--popup-text-muted);
+}
+
+.search-field input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: var(--popup-text);
+  background: transparent;
+}
+
+.search-field input::placeholder {
+  color: var(--popup-text-muted);
+}
+
+.inline-help {
+  flex-shrink: 0;
+  margin-left: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.inline-help svg {
+  stroke: var(--popup-text-muted);
+}
+
+.chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1.5px solid var(--popup-border);
+  border-radius: 10px;
+  background: var(--popup-bg);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--popup-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.chip-btn:hover {
+  background: var(--popup-hover);
+  border-color: var(--popup-text-muted);
+}
+
+/* ============================================================
+   VIEW TOGGLE BUTTON
+   ============================================================ */
+.view-toggle-btn {
+  flex-shrink: 0;
+}
+
+.view-toggle-btn svg {
+  stroke: var(--popup-text-muted);
+  transition: stroke 0.15s;
+}
+
+.view-toggle-btn:hover svg {
+  stroke: var(--popup-text);
+}
+
+/* ============================================================
+   SHORTCUTS - GRID VIEW (default)
+   ============================================================ */
+.shortcuts-grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 8px 12px 4px;
+  min-height: 60px;
+}
+
+.shortcuts-grid li {
+  position: relative;
+  width: 33.333%;
+  text-align: center;
+  padding: 14px 4px 10px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.12s;
+}
+
+.shortcuts-grid li:hover {
+  background: var(--popup-hover);
+}
+
+.shortcut-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.shortcut-favicon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  margin-bottom: 2px;
+  opacity: 0.85;
+}
+
+.shortcut-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--popup-text);
+  letter-spacing: -0.2px;
+}
+
+.shortcut-url-text {
+  display: none;
+}
+
+.shortcut-folder-badge {
+  display: none;
+}
+
+.usage-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--popup-text-muted);
+  margin-top: 1px;
+}
+
+.empty-state {
+  display: block !important;
+  width: 100% !important;
+  text-align: center;
+  color: var(--popup-text-muted);
+  font-size: 13px;
+  padding: 28px 0;
+}
+
+/* ============================================================
+   SHORTCUTS - LIST VIEW
+   ============================================================ */
+.shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 8px;
+  min-height: 60px;
+}
+
+.shortcuts-list li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.12s;
+}
+
+.shortcuts-list li:hover {
+  background: var(--popup-hover);
+}
+
+.shortcuts-list li.folder-open {
+  display: block;
+  background: var(--popup-hover, rgba(255,255,255,0.04));
+  padding-bottom: 4px;
+}
+
+.shortcuts-list li.folder-open > .shortcut-inner {
+  display: inline-flex;
+}
+
+.shortcuts-list li.folder-open > .dropdown-menu {
+  float: right;
+  margin-top: 2px;
+}
+
+.shortcuts-list li.folder-open:hover > .dropdown-menu {
+  display: inline-flex;
+}
+
+.shortcuts-list li.folder-open .folder-children {
+  clear: both;
+  border-top: 1px solid var(--popup-border, rgba(255,255,255,0.08));
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
+.shortcuts-list .shortcut-inner {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.shortcuts-list .shortcut-favicon {
+  width: 20px;
+  height: 20px;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.shortcuts-list .shortcut-name {
+  font-size: 13px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.shortcuts-list .shortcut-url-text {
+  display: block;
+  font-size: 11px;
+  color: var(--popup-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+}
+
+.shortcuts-list .shortcut-folder-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--popup-accent);
+  background: rgba(40, 137, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.shortcuts-list .shortcut-folder-badge svg {
+  width: 10px;
+  height: 10px;
+  stroke: var(--popup-accent);
+}
+
+.shortcuts-list .dropdown-menu {
+  position: static;
+  transform: none;
+  display: none;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  gap: 0;
+}
+
+.shortcuts-list li:hover .dropdown-menu {
+  display: flex;
+  gap: 2px;
+}
+
+.shortcuts-list .empty-state {
+  padding: 20px 0;
+}
+
+/* Dropdown on hover */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  bottom: calc(100% - 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--popup-bg);
+  border: 1px solid var(--popup-border);
+  box-shadow: var(--popup-shadow);
+  border-radius: 10px;
+  padding: 4px;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.shortcuts-grid li:hover .dropdown-menu {
+  display: flex;
+  gap: 2px;
+}
+
+.dropdown-menu button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent;
+  transition: background-color 0.12s;
+}
+
+.delete-icon {
+  background-image: url("images/trash.svg");
+}
+
+.delete-icon:hover {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+.edit-icon {
+  background-image: url("images/edit.svg");
+}
+
+.edit-icon:hover {
+  background-color: rgba(40, 137, 255, 0.1);
+}
+
+.go-to-icon {
+  background-image: url("images/maps-arrow-diagonal.svg");
+}
+
+.go-to-icon:hover {
+  background-color: rgba(34, 197, 94, 0.1);
+}
+
+.copy-icon {
+  background-image: url("images/copy.svg");
+}
+
+.copy-icon:hover {
+  background-color: rgba(168, 85, 247, 0.1);
+}
+
+/* ============================================================
+   FOLDER ACCORDION (popup)
+   ============================================================ */
+
+.folder-children {
+  width: 100%;
+  padding: 2px 0 4px 0;
+  border-top: 1px solid var(--popup-border, rgba(255,255,255,0.08));
+  margin-top: 4px;
+}
+
+.folder-child-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+  position: relative;
+}
+
+.folder-child-item:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.folder-child-item .shortcut-favicon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.folder-child-item .shortcut-name {
+  flex: 1;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--popup-text, #e2e8f0);
+}
+
+.folder-child-item .shortcut-url-text {
+  font-size: 10px;
+  color: var(--popup-text-secondary, rgba(255,255,255,0.4));
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.folder-child-actions {
+  display: none;
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.folder-child-item:hover .folder-child-actions {
+  display: flex;
+}
+
+.folder-child-item:hover .shortcut-url-text {
+  display: none;
+}
+
+.folder-child-actions button {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-size: 12px 12px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent;
+  transition: background-color 0.12s;
+}
+
+/* Grid view: folder accordion spans full width — matches list view layout */
+.shortcuts-grid li.folder-open {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shortcuts-grid li.folder-open .shortcut-inner {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-start;
+  flex: 1;
+  min-width: 0;
+}
+
+.shortcuts-grid li.folder-open .shortcut-url-text {
+  display: block;
+  font-size: 11px;
+  color: var(--popup-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+}
+
+.shortcuts-grid li.folder-open .shortcut-folder-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--popup-accent);
+  background: rgba(40, 137, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.shortcuts-grid li.folder-open .shortcut-folder-badge svg {
+  width: 10px;
+  height: 10px;
+  stroke: var(--popup-accent);
+}
+
+.shortcuts-grid li.folder-open .dropdown-menu {
+  position: static;
+  transform: none;
+  display: flex;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  gap: 2px;
+}
+
+.shortcuts-grid li.folder-open .folder-children {
+  width: 100%;
+  text-align: left;
+  clear: both;
+  border-top: 1px solid var(--popup-border, rgba(255,255,255,0.08));
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
+.shortcuts-grid .folder-children {
+  text-align: left;
+}
+
+.shortcuts-grid .folder-child-item {
+  padding-left: 30px;
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: var(--popup-bg);
+  border: 1px solid var(--popup-border);
+  border-radius: 18px;
+  padding: 24px;
+  width: 340px;
+  max-width: 92%;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16);
+  animation: modalIn 0.25s ease;
+}
+
+@keyframes modalIn {
+  from { transform: translateY(-12px) scale(0.97); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--popup-text);
+  margin-bottom: 8px;
+}
+
+.modal-body {
+  font-size: 13px;
+  color: var(--popup-text-secondary);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.modal-inputs label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--popup-text-secondary);
+  margin-bottom: 6px;
+  margin-top: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.modal-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1.5px solid var(--popup-border);
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: var(--popup-text);
+  background: var(--popup-bg);
+  outline: none;
+  transition: all 0.15s;
+}
+
+.modal-input:focus {
+  border-color: var(--popup-border-focus);
+  box-shadow: 0 0 0 3px rgba(40, 137, 255, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.modal-btn {
+  height: 36px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.modal-btn-cancel {
+  background: var(--popup-hover);
+  color: var(--popup-text-secondary);
+}
+
+.modal-btn-cancel:hover {
+  background: var(--popup-border);
+}
+
+.modal-btn-save {
+  background: linear-gradient(135deg, #2889FF, #7F51FF);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(40, 137, 255, 0.2);
+}
+
+.modal-btn-save:hover {
+  background: linear-gradient(135deg, #1a75e8, #6b3fe8);
+}
+
+.modal-btn-danger {
+  background: #DC2626;
+  color: #fff;
+}
+
+.modal-btn-danger:hover {
+  background: #B91C1C;
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 2000;
+  max-width: 360px;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.toast.hidden {
+  display: none;
+}
+
+.toast-visible {
+  opacity: 1 !important;
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+.toast-success { background: linear-gradient(135deg, #2889FF, #7F51FF); }
+.toast-error { background: #DC2626; }
+.toast-info { background: #374151; }
+
+/* ============================================================
+   TAGS INPUT WIDGET
+   ============================================================ */
+.tags-input-container {
+  width: 100%;
+  min-height: 42px;
+}
+
+.tags-input-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1.5px solid var(--popup-border);
+  border-radius: 12px;
+  background: var(--popup-bg);
+  min-height: 42px;
+  transition: border-color 0.15s;
+}
+
+.tags-input-wrapper:focus-within {
+  border-color: var(--popup-border-focus);
+  box-shadow: 0 0 0 3px rgba(40, 137, 255, 0.08);
+}
+
+.tags-input-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tags-input-field {
+  flex: 1;
+  min-width: 80px;
+  border: none;
+  background: transparent;
+  color: var(--popup-text);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  padding: 2px 0;
+}
+
+.tags-input-field::placeholder {
+  color: var(--popup-text-muted);
+}
+
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  background: rgba(127, 81, 255, 0.12);
+  color: var(--popup-accent-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.tag-pill-editable {
+  cursor: default;
+  gap: 4px;
+  padding-right: 4px;
+}
+
+.tag-pill-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: transparent;
+  border: none;
+  color: var(--popup-accent-secondary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.6;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.tag-pill-remove:hover {
+  opacity: 1;
+  background: rgba(127, 81, 255, 0.15);
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--popup-text-muted); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--popup-text-secondary); }
+
+/* ============================================================
+   AI BADGE
+   ============================================================ */
+.shortcut-ai-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: #7F51FF;
+  background: rgba(127, 81, 255, 0.12);
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   POPUP CHAT (Ask 0tab mini)
+   ============================================================ */
+.popup-chat-toggle {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--popup-accent), var(--popup-accent-secondary));
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(40, 137, 255, 0.35);
+  z-index: 100;
+  transition: transform 0.15s;
+}
+.popup-chat-toggle:hover { transform: scale(1.1); }
+.popup-chat-toggle.active { display: none; }
+
+.popup-chat-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  background: var(--popup-bg);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  animation: popupChatSlide 0.2s ease-out;
+}
+.popup-chat-panel.hidden { display: none; }
+@keyframes popupChatSlide {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.popup-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--popup-border);
+}
+.popup-chat-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--popup-text);
+}
+.popup-chat-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--popup-text-secondary);
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+.popup-chat-close:hover {
+  background: var(--popup-hover);
+  color: var(--popup-text);
+}
+
+.popup-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.popup-chat-msg {
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  max-width: 88%;
+  word-wrap: break-word;
+}
+.popup-chat-bot {
+  background: var(--popup-hover);
+  color: var(--popup-text);
+  align-self: flex-start;
+  border-bottom-left-radius: 3px;
+}
+.popup-chat-user {
+  background: var(--popup-accent);
+  color: #fff;
+  align-self: flex-end;
+  border-bottom-right-radius: 3px;
+}
+
+.popup-chat-msg strong { color: var(--popup-accent); font-weight: 600; }
+.popup-chat-msg code {
+  background: var(--popup-bg-secondary);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+.popup-chat-msg .pchat-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--popup-bg-secondary);
+  border: 1px solid var(--popup-border);
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin: 3px 3px 3px 0;
+  font-size: 11px;
+}
+.popup-chat-msg .pchat-stat-val {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--popup-accent);
+}
+.popup-chat-msg .pchat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--popup-border);
+  font-size: 11px;
+}
+.popup-chat-msg .pchat-item:last-child { border-bottom: none; }
+.popup-chat-msg .pchat-item img { width: 12px; height: 12px; border-radius: 2px; }
+.popup-chat-msg .pchat-item-meta { color: var(--popup-text-muted); margin-left: auto; font-size: 10px; }
+.popup-chat-msg .pchat-tag {
+  display: inline-block;
+  background: var(--popup-bg-secondary);
+  border: 1px solid var(--popup-border);
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  margin: 2px 2px 2px 0;
+}
+
+/* Typing */
+.popup-chat-typing {
+  display: flex;
+  gap: 3px;
+  padding: 8px 10px;
+  background: var(--popup-hover);
+  border-radius: 10px;
+  border-bottom-left-radius: 3px;
+  align-self: flex-start;
+}
+.popup-chat-typing span {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--popup-text-muted);
+  animation: pchatType 1.4s infinite both;
+}
+.popup-chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+.popup-chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pchatType {
+  0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1); }
+}
+
+/* Action area */
+.popup-chat-action-area {
+  padding: 8px 10px;
+  border-top: 1px solid var(--popup-border);
+  background: var(--popup-bg-secondary);
+}
+.popup-chat-action-area.hidden { display: none; }
+.popup-chat-action-area label {
+  display: block; font-size: 10px; font-weight: 500;
+  color: var(--popup-text-secondary); margin: 6px 0 2px;
+}
+.popup-chat-action-area label:first-child { margin-top: 0; }
+.popup-chat-action-area input[type="text"] {
+  width: 100%; padding: 5px 8px;
+  background: var(--popup-bg); border: 1px solid var(--popup-border);
+  border-radius: 6px; color: var(--popup-text); font-size: 11px; font-family: inherit;
+  box-sizing: border-box;
+}
+.popup-chat-action-area input:focus { border-color: var(--popup-border-focus); outline: none; }
+.pchat-action-btns {
+  display: flex; gap: 6px; margin-top: 8px;
+}
+.pchat-action-btns button {
+  flex: 1; padding: 5px 0; border-radius: 6px; font-size: 11px; font-weight: 500;
+  cursor: pointer; border: 1px solid var(--popup-border);
+  background: var(--popup-hover); color: var(--popup-text); transition: all 0.15s;
+}
+.pchat-action-btns .pchat-btn-primary {
+  background: var(--popup-accent); border-color: var(--popup-accent); color: #fff;
+}
+
+/* Input row */
+.popup-chat-input-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--popup-border);
+}
+.popup-chat-input {
+  flex: 1; padding: 6px 8px;
+  background: var(--popup-bg-secondary); border: 1px solid var(--popup-border);
+  border-radius: 8px; color: var(--popup-text); font-size: 12px; font-family: inherit;
+}
+.popup-chat-input:focus { border-color: var(--popup-border-focus); outline: none; }
+.popup-chat-input::placeholder { color: var(--popup-text-muted); }
+.popup-chat-send {
+  width: 28px; height: 28px; border-radius: 8px; border: none;
+  background: var(--popup-accent); color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.popup-chat-send:hover { opacity: 0.85; }
+
+/* ============================================================
+   PIN / DRAG-TO-PIN
+   ============================================================ */
+.shortcuts-grid li,
+.shortcuts-list li {
+  position: relative;
+}
+.shortcuts-grid li.dragging,
+.shortcuts-list li.dragging {
+  opacity: 0.45;
+  cursor: grabbing;
+}
+.shortcuts-grid li[draggable="true"] .shortcut-inner,
+.shortcuts-list li[draggable="true"] .shortcut-inner {
+  cursor: grab;
+}
+.shortcuts-grid li[draggable="true"]:active .shortcut-inner,
+.shortcuts-list li[draggable="true"]:active .shortcut-inner {
+  cursor: grabbing;
+}
+
+/* Drop indicator — colored bar on the side facing the insertion point */
+.shortcuts-grid li.shortcut-drop-before { box-shadow: -3px 0 0 var(--popup-accent, #2889FF); }
+.shortcuts-grid li.shortcut-drop-after  { box-shadow:  3px 0 0 var(--popup-accent, #2889FF); }
+.shortcuts-list li.shortcut-drop-before { box-shadow: 0 -2px 0 var(--popup-accent, #2889FF); }
+.shortcuts-list li.shortcut-drop-after  { box-shadow: 0  2px 0 var(--popup-accent, #2889FF); }
+
+/* Pin badge sits on the tile itself */
+.shortcut-pin-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: var(--popup-accent, #2889FF);
+  color: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.95;
+  transform: rotate(40deg);
+  transition: transform 120ms ease, opacity 120ms ease;
+  z-index: 2;
+}
+.shortcut-pin-badge:hover {
+  transform: rotate(40deg) scale(1.12);
+  opacity: 1;
+}
+.shortcuts-list .shortcut-pin-badge {
+  position: relative;
+  top: auto;
+  right: auto;
+  margin-left: 6px;
+  width: 14px;
+  height: 14px;
+}
+
+/* Subtle highlight on pinned tiles */
+.shortcuts-grid li.shortcut-pinned .shortcut-inner,
+.shortcuts-list li.shortcut-pinned .shortcut-inner {
+  border-color: rgba(40, 137, 255, 0.35);
+}
+
+/* Pin button in dropdown */
+.dropdown-menu .pin-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--popup-text-secondary, #888);
+  padding: 4px;
+  border-radius: 4px;
+}
+.dropdown-menu .pin-icon:hover {
+  color: var(--popup-accent, #2889FF);
+  background: rgba(40, 137, 255, 0.1);
+}
+.dropdown-menu .pin-icon.pin-icon-active {
+  color: var(--popup-accent, #2889FF);
+}

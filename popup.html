@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <div class="popup">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <img src="icon48.png" alt="Logo" class="header-logo">
+        <span class="header-title">0tab AI</span>
+      </div>
+      <button id="manageBtn" class="header-dashboard-btn" title="Open Dashboard">
+        Dashboard
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      </button>
+    </div>
+
+    <!-- Already-saved status banner (hidden by default) -->
+    <div id="savedBanner" class="saved-banner hidden">
+      <div class="saved-banner-inner">
+        <svg class="saved-banner-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        <span id="savedBannerText">Already saved</span>
+      </div>
+      <span id="savedBannerFolder" class="saved-banner-folder"></span>
+    </div>
+
+    <!-- Create section (Bookmark + Shortcut) -->
+    <div class="create-section">
+      <div class="input-row">
+        <label class="field-label">URL</label>
+        <div class="input-field">
+          <input type="text" id="urlDisplay" placeholder="https://www.0tab.ai" autofocus>
+        </div>
+      </div>
+
+      <div class="input-row">
+        <label class="field-label">Bookmark Name</label>
+        <div class="input-field">
+          <input type="text" id="bookmarkName" placeholder="e.g. My Favorite Page">
+        </div>
+      </div>
+
+      <div class="input-row">
+        <label class="field-label">0tab Shortcut</label>
+        <div class="input-field has-prefix">
+          <span class="input-prefix">0+[tab]</span>
+          <input type="text" id="shortcutName" placeholder="e.g. desk">
+        </div>
+        <a href="https://chromewebstore.google.com/detail/tab0/ejcaloplfaackbkpdiidjgakbogilcdf?authuser=0&hl=en" target="_blank" class="icon-btn help-btn" title="0tab AI on Chrome Web Store">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </a>
+      </div>
+
+      <div class="input-row">
+        <label class="field-label">Bookmark Folder</label>
+        <div class="input-field">
+          <select id="folderSelect" class="folder-select">
+            <option value="">Select folder...</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-row">
+        <label class="field-label">Tags</label>
+        <div id="popupTagsContainer" class="tags-input-container"></div>
+      </div>
+
+      <div class="btn-row">
+        <button id="cancelButton" class="btn btn-outline">Cancel</button>
+        <button id="saveButton" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+
+    <!-- Search + actions row -->
+    <div class="search-row">
+      <div class="search-field">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchShortcuts" placeholder="Search your shortcuts...">
+      </div>
+      <!-- View toggle: grid (default) / list -->
+      <button id="viewToggle" class="icon-btn view-toggle-btn" title="Switch to list view">
+        <svg id="viewToggleIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      </button>
+      <button id="shareButton" class="chip-btn" title="Share extension">
+        Feedback
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+    </div>
+
+    <!-- Shortcuts list (switches between grid and list view) -->
+    <ul id="shortcutList" class="shortcuts-grid"></ul>
+
+    <!-- Ask 0tab AI button (opens dashboard chat) -->
+    <button id="popupChatToggle" class="popup-chat-toggle" title="Ask 0tab AI">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </button>
+
+  </div>
+
+  <!-- Modal -->
+  <div id="modalOverlay" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div id="modalTitle" class="modal-title"></div>
+      <div id="modalBody" class="modal-body"></div>
+      <div id="modalInputs" class="modal-inputs"></div>
+      <div id="modalActions" class="modal-actions"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
