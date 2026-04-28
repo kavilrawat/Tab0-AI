@@ -214,29 +214,80 @@ function storageRemove(keys) {
 }
 
 // --- All-items cache (read-only) ---
-// loadShortcuts() runs on every search keystroke and previously hit
-// chrome.storage.local.get(null) each time. We memoize the snapshot for
-// search/render-only paths and invalidate on any local-storage change.
+// Two-tier cache for the full storage snapshot:
+//   tier 1: in-memory `_allItemsCache` — survives within one popup session,
+//           cheap repeats during search/render. Cleared on storage change.
+//   tier 2: `chrome.storage.session` (RAM, ~5ms reads, persists across popup
+//           opens within the same browser session). Mirrored from .local
+//           on every change so the next popup open can paint from RAM
+//           instead of waiting on a 50-200ms disk read.
+//
 // Callers that mutate entries must continue to use storageGet(null) so
 // they don't read or write through the shared cache reference.
+const _SESSION_SNAPSHOT_KEY = '__0tab_session_snapshot';
 let _allItemsCache = null;
 let _allItemsInFlight = null;
+let _sessionSeedDone = false;
+let _sessionMirrorTimer = null;
+
+// Seed the in-memory cache from session as early as possible so
+// loadShortcuts() can paint from RAM on cold popup opens.
+let _sessionSeedPromise = new Promise(function (resolve) {
+  try {
+    if (!chrome.storage.session) { _sessionSeedDone = true; resolve(); return; }
+    chrome.storage.session.get(_SESSION_SNAPSHOT_KEY, function (r) {
+      _sessionSeedDone = true;
+      if (chrome.runtime.lastError) { resolve(); return; }
+      let snap = r && r[_SESSION_SNAPSHOT_KEY];
+      if (snap && typeof snap === 'object' && Object.keys(snap).length > 0 && _allItemsCache === null) {
+        _allItemsCache = snap;
+      }
+      resolve();
+    });
+  } catch (e) { _sessionSeedDone = true; resolve(); }
+});
+
+// Mirror .local writes to .session (debounced) so the *next* popup open
+// has a warm RAM seed. Cheap because session is in-process memory.
+function _scheduleSessionMirror() {
+  if (_sessionMirrorTimer) return;
+  _sessionMirrorTimer = setTimeout(function () {
+    _sessionMirrorTimer = null;
+    try {
+      if (!chrome.storage.session) return;
+      chrome.storage.local.get(null, function (all) {
+        if (chrome.runtime.lastError) return;
+        try { chrome.storage.session.set({ [_SESSION_SNAPSHOT_KEY]: all || {} }); } catch (e) {}
+      });
+    } catch (e) {}
+  }, 500);
+}
+
 try {
   chrome.storage.onChanged.addListener(function (_changes, area) {
-    if (area === 'local') _allItemsCache = null;
+    if (area !== 'local') return;
+    _allItemsCache = null;
+    _scheduleSessionMirror();
   });
 } catch (e) { /* onChanged unavailable in some test contexts */ }
+
 function storageGetAllCached() {
   if (_allItemsCache) return Promise.resolve(_allItemsCache);
   if (_allItemsInFlight) return _allItemsInFlight;
-  _allItemsInFlight = storageGet(null).then(function (items) {
+  _allItemsInFlight = (async function () {
+    // Give the session-seed read a chance to populate _allItemsCache first.
+    if (!_sessionSeedDone) await _sessionSeedPromise;
+    if (_allItemsCache) { _allItemsInFlight = null; return _allItemsCache; }
+    // Session miss — fall through to the canonical .local read.
+    let items = await storageGet(null);
     _allItemsCache = items || {};
+    // Prime the session cache so future popup opens are fast.
+    try {
+      if (chrome.storage.session) chrome.storage.session.set({ [_SESSION_SNAPSHOT_KEY]: _allItemsCache });
+    } catch (e) {}
     _allItemsInFlight = null;
     return _allItemsCache;
-  }, function (err) {
-    _allItemsInFlight = null;
-    throw err;
-  });
+  })();
   return _allItemsInFlight;
 }
 // Warm the storage snapshot the moment the script runs so loadShortcuts()
