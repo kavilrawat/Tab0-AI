@@ -4048,28 +4048,43 @@ async function navigateToLibraryAndOpenFolder(folderId, fallbackTitle) {
   try { await loadBookmarksView(); } catch (e) { return; }
   if (typeof loadShortcutsTable === 'function') loadShortcutsTable();
 
-  // 3. Walk the cached tree to find the folder node by id.
-  if (!folderId) {
-    if (fallbackTitle) showToast('Showing Library — folder "' + fallbackTitle + '" no longer exists.', 'info');
-    return;
-  }
+  // 3. Walk the cached tree to find the folder node by id, then by title.
+  // String-coerce the id comparison because legacy shortcut data sometimes
+  // stored folderId as a number while chrome.bookmarks always returns
+  // string ids. Title fallback handles the case where the folder was
+  // recreated (new id) but the shortcut still points at the old one.
   let tree = window._tab0CachedTree;
   if (!tree) return;
-  function findNode(node, id) {
+  let targetId = folderId != null ? String(folderId) : null;
+  let targetTitle = fallbackTitle || null;
+  function findNode(node, predicate) {
     if (!node) return null;
-    if (node.id === id) return node;
+    if (predicate(node)) return node;
     if (node.children) {
-      for (let c of node.children) { let f = findNode(c, id); if (f) return f; }
+      for (let c of node.children) { let f = findNode(c, predicate); if (f) return f; }
     }
     return null;
   }
-  let node = null;
   let roots = Array.isArray(tree) ? tree : [tree];
-  for (let r of roots) { node = findNode(r, folderId); if (node) break; }
+  let node = null;
+  if (targetId) {
+    for (let r of roots) {
+      node = findNode(r, function (n) { return !n.url && String(n.id) === targetId; });
+      if (node) break;
+    }
+  }
+  // Fall back to matching by folder title (skip leaf bookmarks, prefer
+  // the deepest match so a nested "0tab AI" beats a top-level one).
+  if (!node && targetTitle) {
+    for (let r of roots) {
+      node = findNode(r, function (n) { return !n.url && n.title === targetTitle; });
+      if (node) break;
+    }
+  }
   if (node && typeof openFolderDetail === 'function') {
     openFolderDetail(node);
-  } else if (fallbackTitle) {
-    showToast('Folder "' + fallbackTitle + '" no longer exists.', 'info');
+  } else if (targetTitle) {
+    showToast('Showing Library — folder "' + targetTitle + '" no longer exists.', 'info');
   }
 }
 
